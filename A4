@@ -1,0 +1,189 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
+class Room {
+private:
+    int roomNumber;
+    std::string roomType;
+    double pricePerNight;
+    bool isBooked;
+    std::string customerName;
+    int daysBooked;
+
+public:
+    Room(int num, std::string type, double price) 
+        : roomNumber(num), roomType(type), pricePerNight(price), isBooked(false), customerName(""), daysBooked(0) {}
+
+    int getRoomNumber() const { return roomNumber; }
+    bool getIsBooked() const { return isBooked; }
+    std::string getRoomType() const { return roomType; }
+    double getPricePerNight() const { return pricePerNight; }
+    std::string getCustomerName() const { return customerName; }
+    int getDaysBooked() const { return daysBooked; }
+
+    void book(const std::string& name, int days) {
+        isBooked = true;
+        customerName = name;
+        daysBooked = days;
+    }
+
+    void cancel() {
+        isBooked = false;
+        customerName = "";
+        daysBooked = 0;
+    }
+
+    double calculateTotalCost() const {
+        return daysBooked * pricePerNight;
+    }
+};
+
+class BookingSystem {
+private:
+    std::vector<Room> rooms;
+
+    Room* findRoom(int roomNumber) {
+        for (auto& room : rooms) {
+            if (room.getRoomNumber() == roomNumber) {
+                return &room;
+            }
+        }
+        return nullptr;
+    }
+
+public:
+    BookingSystem() {
+        // Initialize the hotel with a mix of Standard and Deluxe rooms
+        rooms.push_back(Room(101, "Standard", 80.0));
+        rooms.push_back(Room(102, "Standard", 80.0));
+        rooms.push_back(Room(103, "Standard", 80.0));
+        rooms.push_back(Room(201, "Deluxe", 150.0));
+        rooms.push_back(Room(202, "Deluxe", 150.0));
+        rooms.push_back(Room(301, "Suite", 300.0));
+    }
+
+    void displayAllRooms() const {
+        std::cout << "\n==================== HOTEL ROOM STATUS ====================\n";
+        std::cout << std::left << std::setw(10) << "Room No" 
+                  << std::setw(15) << "Type" 
+                  << std::setw(15) << "Price/Night" 
+                  << "Status\n";
+        std::cout << "-----------------------------------------------------------\n";
+        for (const auto& room : rooms) {
+            std::cout << std::left << std::setw(10) << room.getRoomNumber()
+                      << std::setw(15) << room.getRoomType()
+                      << "$" << std::left << std::setw(14) << room.getPricePerNight()
+                      << (room.getIsBooked() ? "[Booked by " + room.getCustomerName() + "]" : "[Available]") 
+                      << "\n";
+        }
+        std::cout << "===========================================================\n";
+    }
+
+    void bookRoom() {
+        int roomNum;
+        std::string guestName;
+        int days;
+
+        std::cout << "\nEnter Room Number to Book: ";
+        if (!(std::cin >> roomNum)) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cout << "Invalid input format.\n";
+            return;
+        }
+
+        Room* room = findRoom(roomNum);
+        if (!room) {
+            std::cout << "Error: Room " << roomNum << " does not exist.\n";
+            return;
+        }
+
+        if (room->getIsBooked()) {
+            std::cout << "Error: Room " << roomNum << " is already occupied.\n";
+            return;
+        }
+
+        std::cin.ignore(); // Clear newline character from buffer
+        std::cout << "Enter Guest Full Name: ";
+        std::getline(std::cin, guestName);
+
+        std::cout << "Enter Number of Nights: ";
+        if (!(std::cin >> days) || days <= 0) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cout << "Invalid number of nights.\n";
+            return;
+        }
+
+        room->book(guestName, days);
+        std::cout << "\n Booking Successful!\n";
+        std::cout << "Total Cost for " << days << " night(s): $" << room->calculateTotalCost() << "\n";
+    }
+
+    void cancelBooking() {
+        int roomNum;
+        std::cout << "\nEnter Room Number to Cancel Booking: ";
+        if (!(std::cin >> roomNum)) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cout << "Invalid input format.\n";
+            return;
+        }
+
+        Room* room = findRoom(roomNum);
+        if (!room) {
+            std::cout << "Error: Room " << roomNum << " does not exist.\n";
+            return;
+        }
+
+        if (!room->getIsBooked()) {
+            std::cout << "Notice: Room " << roomNum << " is not currently booked.\n";
+            return;
+        }
+
+        room->cancel();
+        std::cout << "\n Booking for Room " << roomNum << " has been canceled.\n";
+    }
+};
+
+int main() {
+    BookingSystem hotel;
+    int choice = 0;
+
+    while (true) {
+        std::cout << "\n--- MAIN MENU ---\n";
+        std::cout << "1. View All Rooms & Availability\n";
+        std::cout << "2. Book a Room\n";
+        std::cout << "3. Cancel a Booking\n";
+        std::cout << "4. Exit Application\n";
+        std::cout << "Select an option (1-4): ";
+        
+        if (!(std::cin >> choice)) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cout << "Please enter a valid numeric choice.\n";
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                hotel.displayAllRooms();
+                break;
+            case 2:
+                hotel.displayAllRooms();
+                hotel.bookRoom();
+                break;
+            case 3:
+                hotel.cancelBooking();
+                break;
+            case 4:
+                std::cout << "\nThank you for using the Booking System. Goodbye!\n";
+                return 0;
+            default:
+                std::cout << "Invalid choice. Please select between 1 and 4.\n";
+        }
+    }
+    return 0;
+}

@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+using namespace std;
+
+int main(){
+	
+	vector<string> name = {};
+	vector<int> age = {};
+	vector<string> favFood = {};
+	string getName;
+	int getAge;
+	char getfavFood;
+	string food;
+	char yesno;
+	
+	do{
+		
+	cin.sync();
+	
+	cout << "\n=====Table AAA=====\n";
+	cout << "Enter Name : ";
+	getline(cin,getName);
+	name.push_back(getName);
+	
+	cout << "Enter Age : ";
+	cin >> getAge;
+	if(getAge < 0){
+		cout << "\nInvalid Age. Please enter again : ";
+		cin >> getAge;
+	}
+	age.push_back(getAge);
+	
+	cout << "Pick Favorite Bevarage🍔 : ";
+	cin >> getfavFood;
+	switch(getfavFood){
+		case 'a':
+			food = "otak manusia salai";
+			break;
+		case 'b':
+			food = "sate kepala manusia";
+			break;
+		case 'c':
+			food = "buto hafiz bakar";
+			break;
+		case 'd':
+			food = "sup kaki patah";
+			break;
+		default:
+			food = "Invalid";
+			cout << "Invalid";
+			
+	}
+	favFood.push_back(food);
+	
+	cout << "\nDo u want too Enter again? (Y/N) : ";
+	cin >> yesno;
+}while(yesno == 'Y' || yesno == 'y');
+
+	cout << "\n\n========All List=========\n";
+
+	for(int i; i < name.size(); i++){
+		cout << left 
+		<< i+1 << ". " 
+		<< setw(10) << name.at(i) 
+		<< setw(3) << age.at(i) << "Years Old " << "  "
+		<< setw(25) << favFood.at(i)
+		<< "\n";
+	}
+	
+	return 0;
+}
